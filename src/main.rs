@@ -11,19 +11,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     let username = "user";
     let password = "user";
 
-    let mut ftp_stream: FtpClient = FtpClient::connect(address, port)?;
+    let mut ftp_client: FtpClient = FtpClient::connect(address, port)?;
 
-    ftp_stream.login(username, password)?;
+    ftp_client.login(username, password)?;
 
-    ftp_stream.list_files("/files")?;
+    ftp_client.list_files("/files")?;
 
-    ftp_stream.get("/files/jazz.jpg")?;
+    ftp_client.get("/files/jazz.jpg")?;
 
-    ftp_stream.mget(&vec![
+    ftp_client.mget(&vec![
         "/files/founding_fathers.txt",
         "/files/dickbutt.txt",
         "/files/readme.txt",
     ])?;
+
+    ftp_client.quit()?;
 
     Ok(())
 }

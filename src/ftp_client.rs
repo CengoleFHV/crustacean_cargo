@@ -21,7 +21,7 @@ impl FtpClient {
             control_stream: stream,
         };
 
-        let _ = ftp_client.read_response(None)?;
+        ftp_client.read_response(None)?;
 
         Ok(ftp_client)
     }
@@ -31,13 +31,13 @@ impl FtpClient {
             "Logging in with\r\nusername: {} and\r\npassword: {}\r\n",
             username, password
         );
-        let _ = Self::send_command(&mut self.control_stream, format!("USER {}\r\n", username))?;
+        Self::send_command(&mut self.control_stream, format!("USER {}\r\n", username))?;
         let res: String = self.read_response(None)?;
 
         let code = res[0..3].parse::<u32>()?;
 
         if code == status::NEED_PASSWORD {
-            let _ = Self::send_command(&mut self.control_stream, format!("PASS {}\r\n", password))?;
+            Self::send_command(&mut self.control_stream, format!("PASS {}\r\n", password))?;
             self.wait_for_code(vec![status::LOGGED_IN])?;
         }
 
@@ -47,7 +47,7 @@ impl FtpClient {
     }
 
     pub fn list_files(&mut self, path: &str) -> Result<(), Box<dyn Error>> {
-        let _ = Self::send_command(&mut self.control_stream, "PASV\r\n".to_string())?;
+        Self::send_command(&mut self.control_stream, "PASV\r\n".to_string())?;
 
         let res = self.read_response(None)?;
 
@@ -59,17 +59,15 @@ impl FtpClient {
 
             let mut data_stream: TcpStream = TcpStream::connect((data_address, data_port))?;
 
-            let _ = Self::send_command(&mut self.control_stream, format!("LIST {}\r\n", path))?;
+            Self::send_command(&mut self.control_stream, format!("LIST {}\r\n", path))?;
 
             self.wait_for_code(vec![status::ABOUT_TO_SEND])?;
 
             let mut file_listing: String = String::new();
-            let _ = data_stream.read_to_string(&mut file_listing);
+            data_stream.read_to_string(&mut file_listing)?;
 
             println!("Files in the current directory:\n{}", file_listing);
         }
-
-        //loop and read response and wait until the response contains status::CLOSING_DATA_CONNECTION as a string
 
         self.wait_for_code(vec![status::CLOSING_DATA_CONNECTION])?;
 
@@ -77,7 +75,7 @@ impl FtpClient {
     }
 
     pub fn get(&mut self, path: &str) -> Result<(), Box<dyn Error>> {
-        let _ = Self::send_command(&mut self.control_stream, "PASV\r\n".to_string())?;
+        Self::send_command(&mut self.control_stream, "PASV\r\n".to_string())?;
 
         let res = self.read_response(None)?;
 
@@ -89,7 +87,7 @@ impl FtpClient {
 
             let mut data_stream: TcpStream = TcpStream::connect((data_address, data_port))?;
 
-            let _ = Self::send_command(&mut self.control_stream, format!("RETR {}\r\n", path))?;
+            Self::send_command(&mut self.control_stream, format!("RETR {}\r\n", path))?;
 
             self.wait_for_code(vec![status::ABOUT_TO_SEND])?;
 
@@ -121,15 +119,29 @@ impl FtpClient {
 
     //public function that can send the Command TYPE I and TYPE A to ask for Binary or ASCII mode
     pub fn set_binary_mode(&mut self) -> Result<(), Box<dyn Error>> {
-        let _ = Self::send_command(&mut self.control_stream, "TYPE I\r\n".to_string())?;
+        Self::send_command(&mut self.control_stream, "TYPE I\r\n".to_string())?;
         self.read_response(None)?;
 
         Ok(())
     }
 
     pub fn set_ascii_mode(&mut self) -> Result<(), Box<dyn Error>> {
-        let _ = Self::send_command(&mut self.control_stream, "TYPE A\r\n".to_string())?;
+        Self::send_command(&mut self.control_stream, "TYPE A\r\n".to_string())?;
         self.read_response(None)?;
+
+        Ok(())
+    }
+
+    pub fn quit(&mut self) -> Result<(), Box<dyn Error>> {
+        Self::send_command(&mut self.control_stream, "QUIT\r\n".to_string())?;
+
+        self.wait_for_code(vec![
+            status::CLOSING,
+            status::LOGGED_OUT,
+            status::LOGOUT_ACK,
+        ])?;
+
+        println!("Logged out successfully\r\n");
 
         Ok(())
     }

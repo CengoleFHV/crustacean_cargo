@@ -1,9 +1,6 @@
 mod ftp_client;
 
-use std::{
-    error::Error,
-    io::{stdin, Read},
-};
+use std::{error::Error, io::stdin};
 
 use ftp_client::FtpClient;
 

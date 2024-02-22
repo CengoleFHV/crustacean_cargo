@@ -1,3 +1,7 @@
+//Source was taken from here https://docs.rs/ftp/latest/src/ftp/status.rs.html
+//it was a a great implementation
+//Copyright 2024 @mattnenterprise
+
 #![allow(dead_code)]
 
 // 1xx: Positive Preliminary Reply

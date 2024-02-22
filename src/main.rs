@@ -50,10 +50,10 @@ fn main() -> Result<(), Box<dyn Error>> {
                 ftp_client.mget(&paths)?;
             }
             "ascii" => {
-                ftp_client.ascii()?;
+                ftp_client.set_ascii_mode()?;
             }
             "binary" => {
-                ftp_client.binary()?;
+                ftp_client.set_binary_mode()?;
             }
             "help" => {
                 println!("Commands: list, get, mget, ascii, binary, help, quit");

@@ -49,7 +49,15 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let paths: Vec<&str> = paths.split(",").collect();
                 ftp_client.mget(&paths)?;
             }
-            "help" => println!("Commands: list, get, mget, quit"),
+            "ascii" => {
+                ftp_client.ascii()?;
+            }
+            "binary" => {
+                ftp_client.binary()?;
+            }
+            "help" => {
+                println!("Commands: list, get, mget, ascii, binary, help, quit");
+            }
             "quit" => break,
             _ => println!("Invalid command"),
         }

@@ -55,20 +55,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         if command == "quit" {
+            ftp_client.quit()?;
             break;
         }
     }
-
-    ftp_client.get("/files/jazz.jpg")?;
-
-    ftp_client.mget(&vec![
-        "/files/founding_fathers.txt",
-        "/files/dickbutt.txt",
-        "/files/readme.txt",
-    ])?;
-
-    ftp_client.quit()?;
-
     Ok(())
 }
 

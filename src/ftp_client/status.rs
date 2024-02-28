@@ -1,6 +1,6 @@
 //Source was taken from here https://docs.rs/ftp/latest/src/ftp/status.rs.html
-//it was a a great implementation
-//Copyright 2024 @mattnenterprise
+//it was a a great implementation, that I wanted to use in my project
+//©Copyright 2024 @mattnenterprise
 
 #![allow(dead_code)]
 
